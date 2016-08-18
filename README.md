@@ -1,4 +1,98 @@
+// JBoss, Home of Professional Open Source
+// Copyright 2016, Red Hat, Inc. and/or its affiliates, and individual
+// contributors by the @authors tag. See the copyright.txt in the
+// distribution for a full listing of individual contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+## Use case: CI/CD Pipeline
+
+
+### Deploy Jenkins
+
+Install a custom Jenkins image (needs an admin privilege)
+
+----
+$ oc login -u admin -p admin
+$ oc project openshift
+$ oc create -f https://raw.githubusercontent.com/redhat-helloworld-msa/jenkins/master/custom-jenkins.build.yaml
+$ oc start-build custom-jenkins-build --follow
+----
+
+Now install the Jenkins template in the `ci` project:
+
+----
+$ oc login -u openshift-dev -p devel
+$ oc new-project ci
+$ oc policy add-role-to-user edit -z default
+$ oc new-app -p JENKINS_PASSWORD=password -p MEMORY_LIMIT=1024Mi https://raw.githubusercontent.com/openshift/origin/master/examples/jenkins/jenkins-ephemeral-template.json
+$ oc project helloworld-msa
+----
+
+Wait the server to become available in the following URL: https://jenkins-ci.rhel-cdk.10.1.2.2.xip.io/
+
+NOTE: Login with the credentials admin/password
+
+### Demo the pipeline
+
+- Have  readiness probe to show HA during the deployment
+
+----
+$ oc set probe dc/aloha --readiness --get-url=http://:8080/api/health
+----
+
+Once approved, the fixed project will be applied to the `"production"`.
+
+- First introduce `an error` in the production.
+
+----
+$ cd aloha/
+$ vim src/main/java/com/redhat/developers/msa/aloha/AlohaVerticle.java
+
+#  replace  return String.format("Aloha mai %s", hostname);
+#  by       return String.format("Aloca mai %s", hostname);
+----
+
+- Deploy the erroneous version in the production area.
+
+----
+$ mvn clean package; oc start-build aloha --from-dir=. --follow
+----
+
+#### (Option 1) Trigger the build via CLI
+
+----
+$ curl -k "https://admin:password@jenkins-ci.rhel-cdk.10.1.2.2.xip.io/job/Aloha%20Microservices/buildWithParameters?token=MyAuthToken"
+----
+
+#### (Option 2) Trigger the build in Jenkins UI
+
+Access: https://jenkins-ci.rhel-cdk.10.1.2.2.xip.io/
+
+The build should have started automatically. If not, trigger the build yourself.
+
+You should see the pipeline running in: https://jenkins-ci.rhel-cdk.10.1.2.2.xip.io/job/Aloha%20Microservices/
+
+image::images/pipeline.png[]
+
+
+The projects `helloworld-msa-dev` and `helloworld-msa-qa` will be created automatically according to the link:https://github.com/redhat-helloworld-msa/aloha/blob/master/Jenkinsfile[defined Pipeline].
+
+
+
+
+
 # aloha
+
+
 Aloha microservice using Vert.X
 
 The detailed instructions to run *Red Hat Helloworld MSA* demo, can be found at the following repository: <https://github.com/redhat-helloworld-msa/helloworld-msa>
