@@ -1,22 +1,17 @@
 node {
-// test comment
-    stage 'Git checkout'
-    echo 'Checking out git repository'
-    git url: 'https://github.com/tariq-islam/aloha'
+//    stage 'Git checkout'
+//    echo 'Checking out git repository'
+//    git url: 'https://github.com/tariq-islam/aloha'
 
-    stage 'Build project with Maven'
     echo 'Building project'
-    def mvnHome = tool 'M3'
-    def javaHome = tool 'jdk8'
-    sh "${mvnHome}/bin/mvn package"
 
     stage 'Build image and deploy in Dev'
     echo 'Building docker image and deploying to Dev'
     buildAloha('helloworld-msa-dev')
 
-    stage 'Automated tests'
-    echo 'This stage simulates automated tests'
-    sh "${mvnHome}/bin/mvn -B -Dmaven.test.failure.ignore verify"
+//    stage 'Automated tests'
+//    echo 'This stage simulates automated tests'
+//    sh "${mvnHome}/bin/mvn -B -Dmaven.test.failure.ignore verify"
 
     stage 'Deploy to QA'
     echo 'Deploying to QA'
@@ -33,8 +28,8 @@ node {
 // Creates a Build and triggers it
 def buildAloha(String project){
     projectSet(project)
-    sh "oc new-build --binary --name=aloha -l app=aloha || echo 'Build exists'"
-    sh "oc start-build aloha --from-dir=. --follow"
+    sh "oc new-build https://github.com/tariq-islam/bluegreen || echo 'Build exists'"
+    sh "oc start-build bluegreen --follow"
     appDeploy()
 }
 
@@ -58,8 +53,8 @@ def projectSet(String project){
 
 // Deploy the project based on a existing ImageStream
 def appDeploy(){
-    sh "oc new-app aloha -l app=aloha,hystrix.enabled=true || echo 'Aplication already Exists'"
+    sh "oc new-app bluegreen -l app=bluegreen || echo 'Application already Exists'"
     sh "oc expose service aloha || echo 'Service already exposed'"
-    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","ports":[{"containerPort": 8778,"name":"jolokia"}]}]}}}}\''
-    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","readinessProbe":{"httpGet":{"path":"/api/health","port":8080}}}]}}}}\''
+//    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","ports":[{"containerPort": 8778,"name":"jolokia"}]}]}}}}\''
+//    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","readinessProbe":{"httpGet":{"path":"/api/health","port":8080}}}]}}}}\''
 }
