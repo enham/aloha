@@ -16,4 +16,4 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: ci/jenkins:latest
+      name: jenkins:cicd
