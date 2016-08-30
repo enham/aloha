@@ -37,7 +37,7 @@ def buildAloha(String project){
 def deployAloha(String origProject, String project){
     projectSet(project)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
-    sh "oc tag ${origProject}/aloha:latest ${project}/aloha:latest"
+    sh "oc tag ${origProject}/bluegreen:latest ${project}/bluegreen:latest"
     appDeploy()
 }
 
@@ -54,7 +54,7 @@ def projectSet(String project){
 // Deploy the project based on a existing ImageStream
 def appDeploy(){
     sh "oc new-app bluegreen -l app=bluegreen || echo 'Application already Exists'"
-    sh "oc expose service aloha || echo 'Service already exposed'"
+    sh "oc expose service bluegreen || echo 'Service already exposed'"
 //    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","ports":[{"containerPort": 8778,"name":"jolokia"}]}]}}}}\''
 //    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","readinessProbe":{"httpGet":{"path":"/api/health","port":8080}}}]}}}}\''
 }
