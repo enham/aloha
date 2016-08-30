@@ -1,4 +1,5 @@
 node {
+// test comment
     stage 'Git checkout'
     echo 'Checking out git repository'
     git url: 'https://github.com/tariq-islam/aloha'
@@ -62,4 +63,3 @@ def appDeploy(){
     sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","ports":[{"containerPort": 8778,"name":"jolokia"}]}]}}}}\''
     sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","readinessProbe":{"httpGet":{"path":"/api/health","port":8080}}}]}}}}\''
 }
-
