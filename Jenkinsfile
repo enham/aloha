@@ -25,26 +25,18 @@ node {
 
 // Creates a Build and triggers it
 def buildAloha(String project){
-    projectSet(project)
+    sh "oc project ${project}"
     sh "oc start-build aloha"
     appDeploy()
 }
 
 // Tag the ImageStream from an original project to force a deployment
 def deployAloha(String origProject, String project){
-    projectSet(project)
+    sh "oc login -u openshift-dev -p devel"
+    sh "oc project ${project}"
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/aloha:latest ${project}/aloha:latest"
     appDeploy()
-}
-
-// Login and set the project
-def projectSet(String project){
-    //Use a credential called openshift-dev
-    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'openshift-dev', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-        sh "oc login --insecure-skip-tls-verify=true -u $env.USERNAME -p $env.PASSWORD https://$OPENSHIFT:8443"
-    }
-    sh "oc project ${project}"
 }
 
 // Deploy the project based on a existing ImageStream
