@@ -1,8 +1,4 @@
 node {
-    stage 'Git checkout'
-    echo 'Checking out git repository'
-    git url: 'https://github.com/tariq-islam/aloha'
-
     stage 'Build image and deploy in Dev'
     echo 'Building docker image and deploying to Dev'
     buildAloha('helloworld-msa-dev')
