@@ -17,7 +17,7 @@ node {
 
 // Creates a Build and triggers it
 def buildAloha(String project){
-    sh "oc login https://192.168.122.124:8443 -u openshift-dev -p devel"
+    sh "oc login https://192.168.122.124:8443 --insecure-skip-tls-verify -u openshift-dev -p devel"
     sh "oc project ${project}"
     sh "oc start-build aloha"
     appDeploy()
