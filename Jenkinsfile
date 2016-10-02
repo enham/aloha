@@ -17,6 +17,7 @@ node {
 
 // Creates a Build and triggers it
 def buildAloha(String project){
+    sh "oc login -u openshift-dev -p devel"
     sh "oc project ${project}"
     sh "oc start-build aloha"
     appDeploy()
