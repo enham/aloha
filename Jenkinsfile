@@ -7,10 +7,6 @@ node {
     echo 'Building docker image and deploying to Dev'
     buildAloha('helloworld-msa-dev')
 
-    stage 'Automated tests'
-    echo 'This stage simulates automated tests'
-    sh "${mvnHome}/bin/mvn -B -Dmaven.test.failure.ignore verify"
-
     stage 'Deploy to QA'
     echo 'Deploying to QA'
     deployAloha('helloworld-msa-dev', 'helloworld-msa-qa')
