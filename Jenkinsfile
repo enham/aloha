@@ -6,7 +6,7 @@ node {
     stage 'Deploy to QA'
     echo 'Deploying to QA'
     deployAloha('helloworld-msa-dev', 'helloworld-msa-qa')
-
+ 
     stage 'Wait for approval'
     input 'Aprove to production?'
 
@@ -31,9 +31,9 @@ def deployAloha(String origProject, String project){
     appDeploy()
 }
 
-// Deploy the project based on a existing ImageStream
+// Deploy the project based on an existing ImageStream
 def appDeploy(){
-    sh "oc new-app aloha -l app=aloha,hystrix.enabled=true || echo 'Aplication already Exists'"
+    sh "oc new-app aloha -l app=aloha,hystrix.enabled=true || echo 'Application already Exists'"
     sh "oc expose service aloha || echo 'Service already exposed'"
 }
 
