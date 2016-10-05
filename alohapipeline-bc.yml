@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: aloha-pipeline
+  namespace: helloworld-msa-dev
+  labels:
+    app: aloha
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+spec:
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/tariq-islam/aloha'
+      ref: ocp33-pipeline
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfilePath: Jenkinsfile
+  output:
+    to:
+      kind: ImageStreamTag
+      namespace: helloworld-msa-dev
+      name: 'aloha:latest'
+  resources:
+  postCommit:
+status:
+
