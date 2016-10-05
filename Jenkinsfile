@@ -36,5 +36,7 @@ def deployAloha(String origProject, String project){
 def appDeploy(){
     sh "oc new-app aloha -l app=aloha,hystrix.enabled=true || echo 'Application already Exists'"
     sh "oc expose service aloha || echo 'Service already exposed'"
+    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","ports":[{"containerPort": 8778,"name":"jolokia"}]}]}}}}\''
+    sh 'oc patch dc/aloha -p \'{"spec":{"template":{"spec":{"containers":[{"name":"aloha","readinessProbe":{"httpGet":{"path":"/api/health","port":8080}}}]}}}}\''
 }
 
